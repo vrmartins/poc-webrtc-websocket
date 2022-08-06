@@ -1,19 +1,25 @@
 import { useContext, useEffect } from "react"
 import { useParams } from "react-router-dom"
+import { VideoPlayer } from "../components/VideoPlayer"
 import { RoomContext } from "../context/RoomContext"
 
 export const Room = () => {
     const { id } = useParams()
-    const { ws } = useContext(RoomContext)
+    const { ws, me, stream } = useContext(RoomContext)
 
     useEffect(() => {
-        ws.emit('join-room', { roomId: id })
+        if (me) ws.emit('join-room', { roomId: id, peerId: me._id })
         console.log(`Joined the room ${id}`)
 
         return () => {
-            ws.emit('leave-room', { roomId: id })
+            if (me) ws.emit('leave-room', { roomId: id, peerId: me._id })
             console.log(`Left the room ${id}`)
         }
-    }, [id])
-    return <>Room id {id}</>
+    }, [id, me, ws])
+    return <>
+        Room id {id}
+        <div>
+            <VideoPlayer stream={stream} />
+        </div>
+    </>
 }
