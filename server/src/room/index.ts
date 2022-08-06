@@ -36,6 +36,7 @@ export const roomHandler = (socket: Socket) => {
         }
 
         rooms[roomId].add(peerId)
+        socket.to(roomId).emit('user-joined', { peerId })
         socket.emit('get-users', { roomId, participants: Array.from(rooms[roomId].values()) })
 
         socket.on('disconnect', () => {
